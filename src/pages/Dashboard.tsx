@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Brain, Users, Plus, TrendingUp, Calendar, Star, Sparkles, Timer, Book, MessageCircle } from 'lucide-react';
+import { Heart, Brain, Users, Plus, TrendingUp, Calendar, Star, Sparkles, Timer, Book, MessageCircle, LogOut } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [currentMood, setCurrentMood] = useState(7);
   const [isRecording, setIsRecording] = useState(false);
+  const navigate = useNavigate();
   
   // Mock data for charts
   const moodData = [
@@ -62,6 +64,11 @@ const Dashboard = () => {
     setTimeout(() => setIsRecording(false), 2000);
   };
 
+  const handleSignOut = () => {
+    // Navigate back to the main page
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
@@ -79,6 +86,15 @@ const Dashboard = () => {
                 <Star className="w-3 h-3 mr-1" />
                 Premium
               </Badge>
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                size="sm"
+                className="bg-transparent border-white/30 text-white hover:bg-white/10"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
               <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
                 <span className="text-white font-semibold">JD</span>
               </div>
