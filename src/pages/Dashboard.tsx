@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,12 +6,21 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, Brain, Users, Plus, TrendingUp, Calendar, Star, Sparkles, Timer, Book, MessageCircle, LogOut } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Dashboard = () => {
   const [currentMood, setCurrentMood] = useState(7);
   const [isRecording, setIsRecording] = useState(false);
   const navigate = useNavigate();
+  const { user, profile, signOut, loading } = useAuth();
   
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
   // Mock data for charts
   const moodData = [
     { day: 'Mon', mood: 6, energy: 7 },
@@ -64,10 +72,27 @@ const Dashboard = () => {
     setTimeout(() => setIsRecording(false), 2000);
   };
 
-  const handleSignOut = () => {
-    // Navigate back to the main page
+  const handleSignOut = async () => {
+    await signOut();
     navigate('/');
   };
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center wellness-gradient">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (!user) {
+    return null;
+  }
+
+  const displayName = profile?.full_name || profile?.username || 'Friend';
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -96,7 +121,7 @@ const Dashboard = () => {
                 Sign Out
               </Button>
               <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold">JD</span>
+                <span className="text-white font-semibold text-sm">{initials}</span>
               </div>
             </div>
           </div>
@@ -106,7 +131,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8 animate-fade-in">
-          <h2 className="text-4xl font-bold text-white mb-2">Good morning, Jordan! 🌅</h2>
+          <h2 className="text-4xl font-bold text-white mb-2">Good morning, {displayName}! 🌅</h2>
           <p className="text-white/70 text-lg">How are you feeling today? Let's check in with yourself.</p>
         </div>
 

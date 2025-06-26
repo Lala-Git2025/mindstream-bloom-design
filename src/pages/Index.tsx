@@ -3,10 +3,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Brain, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import ProfileCompletion from '@/components/ProfileCompletion';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { user, profile, loading } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,16 +19,25 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleSignIn = () => {
+    navigate('/auth');
+  };
+
   const handleEnterApp = () => {
     navigate('/dashboard');
   };
 
   const handleTakeQuiz = () => {
-    // TODO: Navigate to quiz page when implemented
+    navigate('/auth');
+  };
+
+  const handleProfileCompleted = () => {
+    // Profile completed, user can now access the dashboard
     navigate('/dashboard');
   };
 
-  if (isLoading) {
+  // Show loading screen while checking auth
+  if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center wellness-gradient">
         <div className="text-center text-white animate-fade-in">
@@ -51,6 +63,53 @@ const Index = () => {
     );
   }
 
+  // If user is logged in but profile is not completed, show profile completion
+  if (user && profile && !profile.profile_completed) {
+    return <ProfileCompletion onProfileCompleted={handleProfileCompleted} />;
+  }
+
+  // If user is logged in and profile is completed, show main app interface
+  if (user && profile?.profile_completed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center wellness-gradient">
+        <div className="text-center text-white max-w-md mx-auto px-6 animate-fade-in">
+          {/* App Icon */}
+          <div className="mb-8">
+            <div className="w-24 h-24 mx-auto bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-md shadow-2xl">
+              <Brain className="w-12 h-12 text-white" />
+            </div>
+          </div>
+
+          {/* App Title */}
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+            MindStream
+          </h1>
+
+          {/* Welcome Message */}
+          <p className="text-xl opacity-90 mb-12">
+            Welcome back, {profile.full_name || profile.username || 'there'}!
+          </p>
+
+          {/* Main Action Button */}
+          <Button 
+            onClick={handleEnterApp}
+            className="w-full mb-4 h-14 text-lg bg-white/90 hover:bg-white text-purple-600 font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          >
+            Enter App
+          </Button>
+
+          {/* Bottom Section */}
+          <div className="space-y-4">
+            <p className="text-white/70">
+              Continue your wellness journey today
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default view for non-authenticated users
   return (
     <div className="min-h-screen flex items-center justify-center wellness-gradient">
       <div className="text-center text-white max-w-md mx-auto px-6 animate-fade-in">
@@ -68,30 +127,22 @@ const Index = () => {
 
         {/* Welcome Message */}
         <p className="text-xl opacity-90 mb-12">
-          Welcome back!
+          Your journey to mental wellness begins here
         </p>
 
         {/* Profile Section */}
         <div className="mb-8">
           <p className="text-lg text-yellow-200 mb-6">
-            Complete Your Profile
+            Start Your Wellness Journey
           </p>
         </div>
 
         {/* Main Action Button */}
         <Button 
-          onClick={handleEnterApp}
+          onClick={handleSignIn}
           className="w-full mb-4 h-14 text-lg bg-white/90 hover:bg-white text-purple-600 font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
         >
-          Enter App
-        </Button>
-
-        {/* Sign Out Button */}
-        <Button 
-          variant="outline" 
-          className="w-full mb-8 h-12 bg-transparent border-white/30 text-white hover:bg-white/10 rounded-full transition-all duration-300"
-        >
-          Sign Out
+          Sign In
         </Button>
 
         {/* Bottom Section */}
