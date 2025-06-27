@@ -9,6 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      habit_completions: {
+        Row: {
+          completed_at: string
+          completed_date: string
+          habit_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          completed_date?: string
+          habit_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          completed_date?: string
+          habit_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "habit_completions_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      habits: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          last_completed_date: string | null
+          name: string
+          streak_count: number | null
+          target_frequency: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_completed_date?: string | null
+          name: string
+          streak_count?: number | null
+          target_frequency?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_completed_date?: string | null
+          name?: string
+          streak_count?: number | null
+          target_frequency?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -42,6 +110,108 @@ export type Database = {
           updated_at?: string
           username?: string | null
           wellness_goals?: string[] | null
+        }
+        Relationships: []
+      }
+      quiz_responses: {
+        Row: {
+          completed_at: string
+          id: string
+          recommendations: string[] | null
+          responses: Json
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          recommendations?: string[] | null
+          responses: Json
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          recommendations?: string[] | null
+          responses?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      wellness_analytics: {
+        Row: {
+          created_at: string
+          date: string
+          energy_level: number | null
+          exercise_minutes: number | null
+          id: string
+          meditation_minutes: number | null
+          mood_score: number | null
+          notes: string | null
+          sleep_hours: number | null
+          stress_level: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          energy_level?: number | null
+          exercise_minutes?: number | null
+          id?: string
+          meditation_minutes?: number | null
+          mood_score?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          energy_level?: number | null
+          exercise_minutes?: number | null
+          id?: string
+          meditation_minutes?: number | null
+          mood_score?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          user_id?: string
         }
         Relationships: []
       }
