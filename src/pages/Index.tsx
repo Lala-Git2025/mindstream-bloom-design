@@ -20,11 +20,11 @@ const Index = () => {
   }, []);
 
   const handleSignIn = () => {
-    navigate('/auth');
+    navigate('/auth?mode=signin');
   };
 
   const handleSignUp = () => {
-    navigate('/auth');
+    navigate('/auth?mode=signup');
   };
 
   const handleEnterApp = () => {
@@ -32,7 +32,7 @@ const Index = () => {
   };
 
   const handleTakeQuiz = () => {
-    navigate('/auth');
+    navigate('/auth?mode=signup');
   };
 
   const handleProfileCompleted = () => {
