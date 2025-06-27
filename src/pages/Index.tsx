@@ -23,6 +23,10 @@ const Index = () => {
     navigate('/auth');
   };
 
+  const handleSignUp = () => {
+    navigate('/auth');
+  };
+
   const handleEnterApp = () => {
     navigate('/dashboard');
   };
@@ -137,13 +141,22 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Main Action Button */}
-        <Button 
-          onClick={handleSignIn}
-          className="w-full mb-4 h-14 text-lg bg-white/90 hover:bg-white text-purple-600 font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-        >
-          Sign In
-        </Button>
+        {/* Action Buttons */}
+        <div className="space-y-3 mb-8">
+          <Button 
+            onClick={handleSignIn}
+            className="w-full h-12 text-lg bg-white/90 hover:bg-white text-purple-600 font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          >
+            Sign In
+          </Button>
+          
+          <Button 
+            onClick={handleSignUp}
+            className="w-full h-12 text-lg bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          >
+            Sign Up
+          </Button>
+        </div>
 
         {/* Bottom Section */}
         <div className="space-y-4">
