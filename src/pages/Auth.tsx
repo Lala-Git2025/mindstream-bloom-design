@@ -147,7 +147,7 @@ const Auth = () => {
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
               <Brain className="w-8 h-8 text-white" />
             </div>
-            <div className="w-16"></div> {/* Spacer for centering */}
+            <div className="w-16"></div>
           </div>
           <CardTitle className="text-2xl text-white">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
