@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Brain, Mail, Lock, User, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -125,12 +126,28 @@ const Auth = () => {
     }
   };
 
+  const handleGoBack = () => {
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center wellness-gradient px-4">
       <Card className="w-full max-w-md glass-card border-white/20">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 mx-auto bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md mb-4">
-            <Brain className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGoBack}
+              className="text-white/80 hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+              <Brain className="w-8 h-8 text-white" />
+            </div>
+            <div className="w-16"></div> {/* Spacer for centering */}
           </div>
           <CardTitle className="text-2xl text-white">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
