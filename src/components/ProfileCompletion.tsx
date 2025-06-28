@@ -86,10 +86,10 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center wellness-gradient px-4">
-      <Card className="w-full max-w-2xl glass-card border-white/20">
+      <Card className="w-full max-w-2xl bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl text-white mb-2">Complete Your Profile</CardTitle>
-          <CardDescription className="text-white/70 text-lg">
+          <CardTitle className="text-3xl text-white mb-2 font-bold">Complete Your Profile</CardTitle>
+          <CardDescription className="text-white/80 text-lg">
             Help us personalize your wellness experience
           </CardDescription>
         </CardHeader>
@@ -97,7 +97,7 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white flex items-center gap-2">
+                <Label htmlFor="username" className="text-white font-medium flex items-center gap-2">
                   <User className="w-4 h-4" />
                   Username
                 </Label>
@@ -107,12 +107,13 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
                   placeholder="Choose a username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/50"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-white flex items-center gap-2">
+                <Label htmlFor="age" className="text-white font-medium flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   Age (Optional)
                 </Label>
@@ -122,13 +123,13 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
                   placeholder="Your age"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/50"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-white flex items-center gap-2">
+              <Label htmlFor="location" className="text-white font-medium flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Location (Optional)
               </Label>
@@ -138,12 +139,12 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
                 placeholder="City, Country"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                className="bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/50"
               />
             </div>
 
             <div className="space-y-4">
-              <Label className="text-white flex items-center gap-2">
+              <Label className="text-white font-medium flex items-center gap-2">
                 <Target className="w-4 h-4" />
                 Wellness Goals (Select all that apply)
               </Label>
@@ -152,9 +153,9 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
                   <Badge
                     key={goal}
                     variant={selectedGoals.includes(goal) ? "default" : "outline"}
-                    className={`cursor-pointer p-3 text-center justify-center transition-all ${
+                    className={`cursor-pointer p-3 text-center justify-center transition-all text-sm ${
                       selectedGoals.includes(goal)
-                        ? 'bg-white/90 text-purple-600 hover:bg-white'
+                        ? 'bg-white text-purple-600 hover:bg-white/90'
                         : 'bg-white/10 text-white border-white/30 hover:bg-white/20'
                     }`}
                     onClick={() => toggleGoal(goal)}
@@ -168,7 +169,7 @@ const ProfileCompletion = ({ onProfileCompleted }: ProfileCompletionProps) => {
             <Button
               type="submit"
               disabled={isLoading || !username.trim()}
-              className="w-full bg-white/90 hover:bg-white text-purple-600 font-semibold h-12 text-lg"
+              className="w-full bg-white text-purple-600 hover:bg-white/90 font-semibold h-12 text-lg shadow-lg hover:shadow-xl transition-all"
             >
               {isLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-600 border-t-transparent" />
