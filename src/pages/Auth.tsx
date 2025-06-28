@@ -132,27 +132,27 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center wellness-gradient px-4">
-      <Card className="w-full max-w-md glass-card border-white/20">
+      <Card className="w-full max-w-md bg-white/95 backdrop-blur-md border-white/30 shadow-2xl">
         <CardHeader className="text-center">
           <div className="flex items-center justify-between mb-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleGoBack}
-              className="text-white/80 hover:text-white hover:bg-white/10"
+              className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
               <Brain className="w-8 h-8 text-white" />
             </div>
             <div className="w-16"></div>
           </div>
-          <CardTitle className="text-2xl text-white">
+          <CardTitle className="text-2xl text-gray-800 font-bold">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </CardTitle>
-          <CardDescription className="text-white/70">
+          <CardDescription className="text-gray-600 text-base">
             {isSignUp 
               ? 'Join MindStream to start your wellness journey' 
               : 'Sign in to continue your wellness journey'
@@ -163,9 +163,11 @@ const Auth = () => {
           <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
             {isSignUp && (
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-white">Full Name</Label>
+                <Label htmlFor="fullName" className="text-gray-700 font-medium text-sm">
+                  Full Name
+                </Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
                     id="fullName"
                     type="text"
@@ -173,16 +175,18 @@ const Auth = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required={isSignUp}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
               </div>
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium text-sm">
+                Email
+              </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   id="email"
                   type="email"
@@ -190,15 +194,17 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 font-medium text-sm">
+                Password
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   id="password"
                   type="password"
@@ -206,7 +212,7 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -214,10 +220,10 @@ const Auth = () => {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-white/90 hover:bg-white text-purple-600 font-semibold h-12"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold h-12 shadow-lg"
             >
               {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-600 border-t-transparent" />
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
               ) : (
                 <>
                   {isSignUp ? 'Create Account' : 'Sign In'}
@@ -230,7 +236,7 @@ const Auth = () => {
           <div className="mt-6 text-center">
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-white/80 hover:text-white text-sm underline underline-offset-4"
+              className="text-purple-600 hover:text-purple-800 text-sm font-medium underline underline-offset-4"
             >
               {isSignUp 
                 ? 'Already have an account? Sign in' 
