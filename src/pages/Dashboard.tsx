@@ -1,454 +1,249 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, Brain, Users, Plus, TrendingUp, Calendar, Star, Sparkles, Timer, Book, MessageCircle, LogOut, BarChart3, Target, HelpCircle } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { useNavigate } from 'react-router-dom';
+
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useSubscription } from '@/hooks/useSubscription';
-import PremiumGate from '@/components/PremiumGate';
-import WellnessAnalytics from '@/components/WellnessAnalytics';
-import HabitTracker from '@/components/HabitTracker';
-import PersonalizedQuiz from '@/components/PersonalizedQuiz';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Brain, 
+  Heart, 
+  BookOpen, 
+  TrendingUp, 
+  Users, 
+  Lightbulb,
+  Edit3,
+  MessageCircle,
+  BarChart3,
+  User,
+  Home
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const [currentMood, setCurrentMood] = useState(7);
-  const [isRecording, setIsRecording] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
-  const { user, profile, signOut, loading } = useAuth();
-  const { isPremium } = useSubscription();
-  
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/');
-    }
-  }, [user, loading, navigate]);
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
-  // Mock data for charts
-  const moodData = [
-    { day: 'Mon', mood: 6, energy: 7 },
-    { day: 'Tue', mood: 7, energy: 6 },
-    { day: 'Wed', mood: 5, energy: 5 },
-    { day: 'Thu', mood: 8, energy: 8 },
-    { day: 'Fri', mood: 9, energy: 9 },
-    { day: 'Sat', mood: 8, energy: 7 },
-    { day: 'Sun', mood: 7, energy: 8 },
+  const moods = [
+    { emoji: '😢', label: 'Sad', value: 'sad' },
+    { emoji: '😐', label: 'Neutral', value: 'neutral' },
+    { emoji: '😊', label: 'Happy', value: 'happy' },
+    { emoji: '😄', label: 'Excited', value: 'excited' },
+    { emoji: '🤩', label: 'Amazing', value: 'amazing' },
   ];
 
-  const aiSuggestions = [
-    {
-      title: "Morning Meditation",
-      description: "Start your day with a 10-minute mindfulness session",
-      type: "meditation",
-      duration: "10 min",
-      icon: Brain,
-      color: "from-purple-400 to-pink-400"
-    },
-    {
-      title: "Gratitude Journal",
-      description: "Reflect on three things you're grateful for today",
-      type: "journaling",
-      duration: "5 min",
-      icon: Heart,
-      color: "from-emerald-400 to-cyan-400"
-    },
-    {
-      title: "Breathing Exercise",
-      description: "Box breathing technique for stress relief",
-      type: "breathing",
-      duration: "7 min",
-      icon: Timer,
-      color: "from-indigo-400 to-purple-400"
-    }
+  const progressData = [
+    { label: 'Mood tracking', percentage: 75, color: 'bg-green-500' },
+    { label: 'Meditation', percentage: 60, color: 'bg-purple-500' },
+    { label: 'Journaling', percentage: 70, color: 'bg-orange-500' },
   ];
 
-  const recentActivities = [
-    { activity: "Completed morning meditation", time: "2 hours ago", type: "meditation" },
-    { activity: "Logged mood entry", time: "4 hours ago", type: "mood" },
-    { activity: "Shared in community", time: "1 day ago", type: "community" },
-    { activity: "Finished breathing exercise", time: "2 days ago", type: "breathing" }
+  const navigationItems = [
+    { icon: Home, label: 'Home', active: true },
+    { icon: TrendingUp, label: 'Mood' },
+    { icon: Heart, label: 'Therapy' },
+    { icon: BarChart3, label: 'Analytics' },
+    { icon: Users, label: 'Community' },
   ];
-
-  const handleMoodLog = () => {
-    setIsRecording(true);
-    setTimeout(() => setIsRecording(false), 2000);
-  };
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
 
-  // Show loading while checking auth
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center wellness-gradient">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated
-  if (!user) {
-    return null;
-  }
-
-  const displayName = profile?.full_name || profile?.username || 'Friend';
-  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-md border-b border-white/10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Brain className="w-8 h-8 text-purple-400" />
-                <h1 className="text-2xl font-bold text-white">MindStream</h1>
-              </div>
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Brain className="h-8 w-8 text-purple-600 mr-3" />
+              <h1 className="text-xl font-bold text-gray-900">MindStream</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="secondary" className={`${isPremium ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/20' : 'bg-gray-500/20 text-gray-300 border-gray-500/20'}`}>
-                <Star className="w-3 h-3 mr-1" />
-                {isPremium ? 'Premium' : 'Free'}
-              </Badge>
-              <Button
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-purple-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">
+                  {profile?.full_name || profile?.username || 'User'}
+                </span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
                 onClick={handleSignOut}
-                variant="outline"
-                size="sm"
-                className="bg-transparent border-white/30 text-white hover:bg-white/10"
+                className="text-gray-600 hover:text-gray-800"
               >
-                <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">{initials}</span>
-              </div>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-8 animate-fade-in">
-          <h2 className="text-4xl font-bold text-white mb-2">Good morning, {displayName}! 🌅</h2>
-          <p className="text-white/70 text-lg">How are you feeling today? Let's check in with yourself.</p>
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            {getGreeting()}, {profile?.full_name?.split(' ')[0] || profile?.username || 'there'}!
+          </h2>
+          <p className="text-gray-600 text-lg">How are you feeling today?</p>
         </div>
 
-        {/* Enhanced Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-black/30 backdrop-blur-md">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-white/20 text-white">
-              <Heart className="w-4 h-4 mr-2" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-white/20 text-white">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="habits" className="data-[state=active]:bg-white/20 text-white">
-              <Target className="w-4 h-4 mr-2" />
-              Habits
-            </TabsTrigger>
-            <TabsTrigger value="quiz" className="data-[state=active]:bg-white/20 text-white">
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Assessment
-            </TabsTrigger>
-            <TabsTrigger value="community" className="data-[state=active]:bg-white/20 text-white">
-              <Users className="w-4 h-4 mr-2" />
-              Community
-            </TabsTrigger>
-          </TabsList>
+        {/* Quick Mood Check */}
+        <Card className="mb-8 bg-white shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-800">Quick mood check</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center space-x-4">
+              {moods.map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => setSelectedMood(mood.value)}
+                  className={`flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:bg-gray-50 ${
+                    selectedMood === mood.value ? 'bg-purple-50 ring-2 ring-purple-200' : ''
+                  }`}
+                >
+                  <div className="text-3xl mb-2">{mood.emoji}</div>
+                  <span className="text-sm font-medium text-gray-700">{mood.label}</span>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Main Content */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Quick Mood Check */}
-                <Card className="glass-card border-white/20 animate-slide-up">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-pink-400" />
-                      Quick Mood Check
-                    </CardTitle>
-                    <CardDescription className="text-white/70">
-                      How are you feeling right now? (1-10)
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/70">😔 Low</span>
-                        <span className="text-white/70 text-2xl">😊 High</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="1"
-                          max="10"
-                          value={currentMood}
-                          onChange={(e) => setCurrentMood(parseInt(e.target.value))}
-                          className="w-full h-3 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
-                        />
-                        <div className="flex justify-between text-xs text-white/50 mt-2">
-                          {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                            <span key={num}>{num}</span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl mb-2">
-                          {currentMood >= 8 ? '😊' : currentMood >= 6 ? '🙂' : currentMood >= 4 ? '😐' : '😔'}
-                        </div>
-                        <Button 
-                          onClick={handleMoodLog}
-                          className={`${isRecording ? 'bg-emerald-500' : 'bg-gradient-to-r from-purple-500 to-pink-500'} hover:scale-105 transition-all duration-300`}
-                          disabled={isRecording}
-                        >
-                          {isRecording ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              Recording...
-                            </>
-                          ) : (
-                            <>
-                              <Plus className="w-4 h-4 mr-2" />
-                              Log Mood
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Mood Chart */}
-                <Card className="glass-card border-white/20 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-emerald-400" />
-                      Your Wellness Journey
-                    </CardTitle>
-                    <CardDescription className="text-white/70">
-                      Track your mood and energy levels over time
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={moodData}>
-                          <defs>
-                            <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                            </linearGradient>
-                            <linearGradient id="energyGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.1}/>
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                          <XAxis dataKey="day" stroke="rgba(255,255,255,0.7)" />
-                          <YAxis stroke="rgba(255,255,255,0.7)" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'rgba(0,0,0,0.8)', 
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              borderRadius: '0.5rem',
-                              color: 'white'
-                            }} 
-                          />
-                          <Area type="monotone" dataKey="mood" stroke="#8b5cf6" fillOpacity={1} fill="url(#moodGradient)" strokeWidth={2} />
-                          <Area type="monotone" dataKey="energy" stroke="#06b6d4" fillOpacity={1} fill="url(#energyGradient)" strokeWidth={2} />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="flex justify-center space-x-6 mt-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                        <span className="text-white/70 text-sm">Mood</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
-                        <span className="text-white/70 text-sm">Energy</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* AI Suggestions */}
-                <Card className="glass-card border-white/20 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-yellow-400" />
-                      AI Recommendations
-                    </CardTitle>
-                    <CardDescription className="text-white/70">
-                      Personalized activities based on your current mood and patterns
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {aiSuggestions.map((suggestion, index) => (
-                        <div key={index} className="group cursor-pointer">
-                          <div className={`glass-card p-4 border-white/20 hover:scale-105 transition-all duration-300 bg-gradient-to-br ${suggestion.color} bg-opacity-20 hover:bg-opacity-30`}>
-                            <div className="flex items-center justify-between mb-3">
-                              <suggestion.icon className="w-6 h-6 text-white" />
-                              <Badge variant="secondary" className="bg-white/20 text-white text-xs">
-                                {suggestion.duration}
-                              </Badge>
-                            </div>
-                            <h4 className="text-white font-semibold mb-2">{suggestion.title}</h4>
-                            <p className="text-white/80 text-sm">{suggestion.description}</p>
-                            <Button 
-                              className="mt-3 w-full bg-white/20 hover:bg-white/30 text-white border-none"
-                              size="sm"
-                            >
-                              Start Now
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+        {/* Wellness Insights */}
+        <Card className="mb-8 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
+          <CardContent className="pt-6">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <Lightbulb className="h-6 w-6 text-orange-500 mt-1" />
               </div>
-
-              {/* Right Column - Sidebar */}
-              <div className="space-y-6">
-                {/* Today's Stats */}
-                <Card className="glass-card border-white/20 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-cyan-400" />
-                      Today's Progress
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white/70">Mindfulness Goal</span>
-                        <span className="text-white">15/20 min</span>
-                      </div>
-                      <Progress value={75} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white/70">Mood Entries</span>
-                        <span className="text-white">3/3</span>
-                      </div>
-                      <Progress value={100} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white/70">Journal Words</span>
-                        <span className="text-white">150/200</span>
-                      </div>
-                      <Progress value={75} className="h-2" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Recent Activity */}
-                <Card className="glass-card border-white/20 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Book className="w-5 h-5 text-purple-400" />
-                      Recent Activity
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {recentActivities.map((activity, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
-                          <div className={`w-2 h-2 rounded-full mt-2 ${
-                            activity.type === 'meditation' ? 'bg-purple-400' :
-                            activity.type === 'mood' ? 'bg-pink-400' :
-                            activity.type === 'community' ? 'bg-cyan-400' : 'bg-emerald-400'
-                          }`}></div>
-                          <div className="flex-1">
-                            <p className="text-white text-sm">{activity.activity}</p>
-                            <p className="text-white/50 text-xs">{activity.time}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="glass-card border-white/20 animate-slide-up" style={{ animationDelay: '0.5s' }}>
-                  <CardHeader>
-                    <CardTitle className="text-white">Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Journal Entry
-                    </Button>
-                    <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white">
-                      <Users className="w-4 h-4 mr-2" />
-                      Join Community
-                    </Button>
-                    <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white">
-                      <Brain className="w-4 h-4 mr-2" />
-                      AI Therapy
-                    </Button>
-                  </CardContent>
-                </Card>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Today's Wellness Insights</h3>
+                <p className="text-gray-700 mb-4">
+                  Your mood tracking shows dedication to your wellness journey. Consider taking a few deep breaths 
+                  and reflecting on what brings you joy today.
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                >
+                  Try it now
+                </Button>
               </div>
             </div>
-          </TabsContent>
+          </CardContent>
+        </Card>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <PremiumGate feature="Wellness Analytics">
-              <WellnessAnalytics />
-            </PremiumGate>
-          </TabsContent>
+        {/* Action Cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="bg-purple-500 p-3 rounded-lg">
+                  <Edit3 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Journal</h3>
+                  <p className="text-gray-600">Express your thoughts</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Habits Tab */}
-          <TabsContent value="habits">
-            <PremiumGate feature="Habit Tracker">
-              <HabitTracker />
-            </PremiumGate>
-          </TabsContent>
+          <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="bg-pink-500 p-3 rounded-lg">
+                  <MessageCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Therapy</h3>
+                  <p className="text-gray-600">AI-guided sessions</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Quiz Tab */}
-          <TabsContent value="quiz">
-            <PremiumGate feature="Personalized Assessment">
-              <PersonalizedQuiz />
-            </PremiumGate>
-          </TabsContent>
-
-          {/* Community Tab */}
-          <TabsContent value="community">
-            <div className="text-center py-12">
-              <Users className="w-16 h-16 text-white/50 mx-auto mb-4" />
-              <h3 className="text-white text-2xl font-semibold mb-2">Community Coming Soon</h3>
-              <p className="text-white/70">Connect with others on their wellness journey</p>
+        {/* Progress Section */}
+        <Card className="mb-8 bg-white shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-800">This Week's Progress</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-6">
+              {progressData.map((item, index) => (
+                <div key={index} className="text-center">
+                  <div className="relative w-24 h-24 mx-auto mb-4">
+                    <svg className="transform -rotate-90 w-24 h-24">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                        className="text-gray-200"
+                        transform="translate(36, 36)"
+                      />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeDasharray={`${item.percentage * 0.628} 62.8`}
+                        className={item.color.replace('bg-', 'text-')}
+                        transform="translate(36, 36)"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-gray-900">{item.percentage}%</span>
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-gray-700">{item.label}</p>
+                </div>
+              ))}
             </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+          </CardContent>
+        </Card>
+      </main>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button 
-          size="lg"
-          className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg animate-float glow-effect"
-        >
-          <Plus className="w-6 h-6" />
-        </Button>
-      </div>
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-around items-center">
+            {navigationItems.map((item, index) => (
+              <button
+                key={index}
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                  item.active
+                    ? 'text-purple-600 bg-purple-50'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <item.icon className="h-5 w-5 mb-1" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
     </div>
   );
 };
