@@ -105,15 +105,15 @@ const Dashboard = () => {
 
   const handleJournalClick = () => {
     toast({
-      title: "Coming Soon!",
-      description: "The journaling feature is being developed. Stay tuned!",
+      title: "Journal Entry",
+      description: "Start writing your thoughts for today. What's on your mind?",
     });
   };
 
   const handleTherapyClick = () => {
     toast({
-      title: "AI Therapy",
-      description: "Connect with our AI therapist for personalized guidance. Feature coming soon!",
+      title: "AI Therapy Session",
+      description: "Welcome to your therapy session. How can I help you today?",
     });
   };
 
@@ -125,22 +125,25 @@ const Dashboard = () => {
       case 'Mood':
         toast({
           title: "Mood Tracker",
-          description: "Detailed mood tracking coming soon!",
+          description: "Track your mood throughout the day to identify patterns.",
         });
         break;
       case 'Therapy':
-        handleTherapyClick();
+        toast({
+          title: "AI Therapy",
+          description: "Start a conversation with your AI therapist for guidance and support.",
+        });
         break;
       case 'Analytics':
         toast({
-          title: "Analytics Dashboard",
-          description: "Detailed analytics and insights coming soon!",
+          title: "Wellness Analytics",
+          description: "View your progress and insights from your wellness journey.",
         });
         break;
       case 'Community':
         toast({
-          title: "Community",
-          description: "Connect with others on their wellness journey. Coming soon!",
+          title: "Wellness Community",
+          description: "Connect with others who share similar wellness goals.",
         });
         break;
       default:
