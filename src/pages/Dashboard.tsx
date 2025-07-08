@@ -18,11 +18,15 @@ import {
   Home
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [isSubmittingMood, setIsSubmittingMood] = useState(false);
 
   const moods = [
     { emoji: '😢', label: 'Sad', value: 'sad' },
@@ -56,6 +60,92 @@ const Dashboard = () => {
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
+  };
+
+  const handleMoodSubmit = async (moodValue: string) => {
+    if (!user || isSubmittingMood) return;
+    
+    setIsSubmittingMood(true);
+    try {
+      const moodScore = { sad: 1, neutral: 2, happy: 3, excited: 4, amazing: 5 }[moodValue] || 3;
+      
+      const { error } = await supabase
+        .from('wellness_analytics')
+        .upsert({
+          user_id: user.id,
+          date: new Date().toISOString().split('T')[0],
+          mood_score: moodScore
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Mood logged!",
+        description: `Thanks for sharing how you're feeling today.`,
+      });
+      setSelectedMood(moodValue);
+    } catch (error) {
+      console.error('Error saving mood:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save your mood. Please try again.",
+      });
+    } finally {
+      setIsSubmittingMood(false);
+    }
+  };
+
+  const handleWellnessInsight = () => {
+    toast({
+      title: "Mindfulness Moment",
+      description: "Take 3 deep breaths: In through your nose for 4 counts, hold for 4, out through your mouth for 6. You've got this! 🌟",
+    });
+  };
+
+  const handleJournalClick = () => {
+    toast({
+      title: "Coming Soon!",
+      description: "The journaling feature is being developed. Stay tuned!",
+    });
+  };
+
+  const handleTherapyClick = () => {
+    toast({
+      title: "AI Therapy",
+      description: "Connect with our AI therapist for personalized guidance. Feature coming soon!",
+    });
+  };
+
+  const handleNavigation = (item: any) => {
+    switch (item.label) {
+      case 'Home':
+        // Already on home
+        break;
+      case 'Mood':
+        toast({
+          title: "Mood Tracker",
+          description: "Detailed mood tracking coming soon!",
+        });
+        break;
+      case 'Therapy':
+        handleTherapyClick();
+        break;
+      case 'Analytics':
+        toast({
+          title: "Analytics Dashboard",
+          description: "Detailed analytics and insights coming soon!",
+        });
+        break;
+      case 'Community':
+        toast({
+          title: "Community",
+          description: "Connect with others on their wellness journey. Coming soon!",
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -110,10 +200,11 @@ const Dashboard = () => {
               {moods.map((mood) => (
                 <button
                   key={mood.value}
-                  onClick={() => setSelectedMood(mood.value)}
+                  onClick={() => handleMoodSubmit(mood.value)}
+                  disabled={isSubmittingMood}
                   className={`flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:bg-gray-50 ${
                     selectedMood === mood.value ? 'bg-purple-50 ring-2 ring-purple-200' : ''
-                  }`}
+                  } ${isSubmittingMood ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className="text-3xl mb-2">{mood.emoji}</div>
                   <span className="text-sm font-medium text-gray-700">{mood.label}</span>
@@ -139,6 +230,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={handleWellnessInsight}
                   className="text-orange-600 border-orange-300 hover:bg-orange-50"
                 >
                   Try it now
@@ -150,7 +242,10 @@ const Dashboard = () => {
 
         {/* Action Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card 
+            onClick={handleJournalClick}
+            className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer"
+          >
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <div className="bg-purple-500 p-3 rounded-lg">
@@ -164,7 +259,10 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card 
+            onClick={handleTherapyClick}
+            className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow cursor-pointer"
+          >
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <div className="bg-pink-500 p-3 rounded-lg">
@@ -231,6 +329,7 @@ const Dashboard = () => {
             {navigationItems.map((item, index) => (
               <button
                 key={index}
+                onClick={() => handleNavigation(item)}
                 className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
                   item.active
                     ? 'text-purple-600 bg-purple-50'
