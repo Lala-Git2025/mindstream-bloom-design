@@ -3,23 +3,27 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Brain, 
   Heart, 
   BookOpen, 
   TrendingUp, 
   Users, 
-  Lightbulb,
-  Edit3,
   MessageCircle,
   BarChart3,
   User,
-  Home
+  Home,
+  Activity,
+  Calendar
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import WellnessChat from '@/components/WellnessChat';
+import DailyWellnessWidget from '@/components/DailyWellnessWidget';
+import WellnessActivities from '@/components/WellnessActivities';
+import WellnessJourney from '@/components/WellnessJourney';
 
 const Dashboard = () => {
   const { user, profile, signOut } = useAuth();
@@ -42,12 +46,14 @@ const Dashboard = () => {
     { label: 'Journaling', percentage: 70, color: 'bg-orange-500' },
   ];
 
+  const [activeTab, setActiveTab] = useState('home');
+
   const navigationItems = [
-    { icon: Home, label: 'Home', active: true },
-    { icon: TrendingUp, label: 'Mood' },
-    { icon: Heart, label: 'Therapy' },
-    { icon: BarChart3, label: 'Analytics' },
-    { icon: Users, label: 'Community' },
+    { icon: Home, label: 'Home', value: 'home' },
+    { icon: MessageCircle, label: 'Chat', value: 'chat' },
+    { icon: Activity, label: 'Activities', value: 'activities' },
+    { icon: Calendar, label: 'Journey', value: 'journey' },
+    { icon: BarChart3, label: 'Analytics', value: 'analytics' },
   ];
 
   const handleSignOut = async () => {
@@ -117,38 +123,8 @@ const Dashboard = () => {
     });
   };
 
-  const handleNavigation = (item: any) => {
-    switch (item.label) {
-      case 'Home':
-        // Already on home
-        break;
-      case 'Mood':
-        toast({
-          title: "Mood Tracker",
-          description: "Track your mood throughout the day to identify patterns.",
-        });
-        break;
-      case 'Therapy':
-        toast({
-          title: "AI Therapy",
-          description: "Start a conversation with your AI therapist for guidance and support.",
-        });
-        break;
-      case 'Analytics':
-        toast({
-          title: "Wellness Analytics",
-          description: "View your progress and insights from your wellness journey.",
-        });
-        break;
-      case 'Community':
-        toast({
-          title: "Wellness Community",
-          description: "Connect with others who share similar wellness goals.",
-        });
-        break;
-      default:
-        break;
-    }
+  const handleNavigation = (value: string) => {
+    setActiveTab(value);
   };
 
   return (
@@ -184,157 +160,161 @@ const Dashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             {getGreeting()}, {profile?.full_name?.split(' ')[0] || profile?.username || 'there'}!
           </h2>
-          <p className="text-gray-600 text-lg">How are you feeling today?</p>
+          <p className="text-gray-600 text-lg">Welcome to your wellness sanctuary</p>
         </div>
 
-        {/* Quick Mood Check */}
-        <Card className="mb-8 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-800">Quick mood check</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center space-x-4">
-              {moods.map((mood) => (
-                <button
-                  key={mood.value}
-                  onClick={() => handleMoodSubmit(mood.value)}
-                  disabled={isSubmittingMood}
-                  className={`flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:bg-gray-50 ${
-                    selectedMood === mood.value ? 'bg-purple-50 ring-2 ring-purple-200' : ''
-                  } ${isSubmittingMood ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                >
-                  <div className="text-3xl mb-2">{mood.emoji}</div>
-                  <span className="text-sm font-medium text-gray-700">{mood.label}</span>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Tabbed Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            {navigationItems.map((item) => (
+              <TabsTrigger key={item.value} value={item.value} className="flex items-center gap-2">
+                <item.icon className="h-4 w-4" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {/* Wellness Insights */}
-        <Card className="mb-8 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
-          <CardContent className="pt-6">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0">
-                <Lightbulb className="h-6 w-6 text-orange-500 mt-1" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Today's Wellness Insights</h3>
-                <p className="text-gray-700 mb-4">
-                  Your mood tracking shows dedication to your wellness journey. Consider taking a few deep breaths 
-                  and reflecting on what brings you joy today.
-                </p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleWellnessInsight}
-                  className="text-orange-600 border-orange-300 hover:bg-orange-50"
-                >
-                  Try it now
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <TabsContent value="home" className="space-y-6">
+            {/* Daily Wellness Widget */}
+            <DailyWellnessWidget />
 
-        {/* Action Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card 
-            onClick={handleJournalClick}
-            className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="bg-purple-500 p-3 rounded-lg">
-                  <Edit3 className="h-6 w-6 text-white" />
+            {/* Quick Mood Check */}
+            <Card className="bg-white shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-800">Quick mood check</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center space-x-4">
+                  {moods.map((mood) => (
+                    <button
+                      key={mood.value}
+                      onClick={() => handleMoodSubmit(mood.value)}
+                      disabled={isSubmittingMood}
+                      className={`flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:bg-gray-50 ${
+                        selectedMood === mood.value ? 'bg-purple-50 ring-2 ring-purple-200' : ''
+                      } ${isSubmittingMood ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      <div className="text-3xl mb-2">{mood.emoji}</div>
+                      <span className="text-sm font-medium text-gray-700">{mood.label}</span>
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Journal</h3>
-                  <p className="text-gray-600">Express your thoughts</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card 
-            onClick={handleTherapyClick}
-            className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="bg-pink-500 p-3 rounded-lg">
-                  <MessageCircle className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Therapy</h3>
-                  <p className="text-gray-600">AI-guided sessions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Progress Section */}
-        <Card className="mb-8 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-800">This Week's Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
-              {progressData.map((item, index) => (
-                <div key={index} className="text-center">
-                  <div className="relative w-24 h-24 mx-auto mb-4">
-                    <svg className="transform -rotate-90 w-24 h-24">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                        className="text-gray-200"
-                        transform="translate(36, 36)"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeDasharray={`${item.percentage * 0.628} 62.8`}
-                        className={item.color.replace('bg-', 'text-')}
-                        transform="translate(36, 36)"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-gray-900">{item.percentage}%</span>
+            {/* Action Cards */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card 
+                onClick={handleJournalClick}
+                className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-purple-500 p-3 rounded-lg">
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Wellness Journal</h3>
+                      <p className="text-gray-600">Record your thoughts and reflections</p>
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-gray-700">{item.label}</p>
-                </div>
-              ))}
+                </CardContent>
+              </Card>
+
+              <Card 
+                onClick={() => setActiveTab('chat')}
+                className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow cursor-pointer"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-pink-500 p-3 rounded-lg">
+                      <MessageCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">AI Wellness Coach</h3>
+                      <p className="text-gray-600">Get personalized guidance and support</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          <TabsContent value="chat">
+            <WellnessChat />
+          </TabsContent>
+
+          <TabsContent value="activities">
+            <WellnessActivities />
+          </TabsContent>
+
+          <TabsContent value="journey">
+            <WellnessJourney />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <Card className="bg-white shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-800">Wellness Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {progressData.map((item, index) => (
+                    <div key={index} className="text-center">
+                      <div className="relative w-24 h-24 mx-auto mb-4">
+                        <svg className="transform -rotate-90 w-24 h-24">
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            fill="none"
+                            className="text-gray-200"
+                            transform="translate(36, 36)"
+                          />
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            fill="none"
+                            strokeDasharray={`${item.percentage * 0.628} 62.8`}
+                            className={item.color.replace('bg-', 'text-')}
+                            transform="translate(36, 36)"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-gray-900">{item.percentage}%</span>
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-gray-700">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+      {/* Bottom Navigation - Mobile Only */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 md:hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-around items-center">
-            {navigationItems.map((item, index) => (
+            {navigationItems.map((item) => (
               <button
-                key={index}
-                onClick={() => handleNavigation(item)}
+                key={item.value}
+                onClick={() => handleNavigation(item.value)}
                 className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-                  item.active
+                  activeTab === item.value
                     ? 'text-purple-600 bg-purple-50'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
